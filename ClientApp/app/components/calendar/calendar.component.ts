@@ -10,11 +10,9 @@ import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 })
 export class CalendarComponent implements OnInit {
 
-    @Input() startDay: string;
+    @Input() startDay: number;
     @Input() initialMonth: number;
     @Input() initialYear: number;
-
-    cells: CalendarCell[];
 
     private emptyTitle = () => "";
     private emptyContent = () => "";
@@ -22,8 +20,11 @@ export class CalendarComponent implements OnInit {
 
     ngOnInit(): void {
         this.monthYearInitializer();
-        this.updateCells();
     }
+
+    getHeaders = () => HeaderBuilder.create()
+        .withStartDay(this.startDay)
+        .build();
 
     getRows(): Row[] {
         let rowCount = 5;
@@ -89,30 +90,6 @@ export class CalendarComponent implements OnInit {
         return [ now.getMonth(), now.getFullYear()];
     }
 
-    private updateCells() {
-        this.cells = this.getDateCells(this.initialMonth, this.initialYear);
-    }
-
-    private getDateCells(month: number, year: number): CalendarCell[] {
-        let date = new Date(year, month, 1);
-        date.setDate(-1);
-        let rows = 5;
-        let cols = 7;
-        let count = rows * cols;
-
-        let calendarCells: CalendarCell[] = [];
-        for (let i = 0; i < rows; i++) {
-            calendarCells.push({ getTitle: () => "Week", getContent: this.emptyContent });
-            for (let j = 0; j < cols; j++) {
-                let tempDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-                calendarCells.push({ getTitle: ()=> this.title(tempDate), getContent: this.emptyContent});
-                date = tempDate;
-            }
-            calendarCells.push({ getTitle: () => "Summary", getContent: this.emptyContent });
-        }
-        return calendarCells;
-    }
-
     private title(date: Date): string {
         if (date.getDate() == 1) {
             return this.getMonthName(date) + " " + date.getDate();
@@ -129,6 +106,19 @@ export class CalendarComponent implements OnInit {
     }
 }
 
+interface IHeaderBuilder {
+
+    build(): Header[];
+}
+
+interface IHeaderBuilderStep1 {
+    withStartDay(startDay: number) : IHeaderBuilder;
+}
+
+interface Header {
+    getContent(): string;
+}
+
 interface Row {
     getCells(): Cell[];
 }
@@ -139,13 +129,59 @@ interface Cell {
     getDate(): Date;
 }
 
-interface CalendarCell {
-    getTitle(): string;
-    getContent(): string;
+class HeaderBuilder implements IHeaderBuilder, IHeaderBuilderStep1 {
+
+    private startDay: () => number;
+
+    withStartDay(startDay: number): IHeaderBuilder {
+        this.startDay = () => startDay;
+        return this;
+    }
+
+    build(): Header[] {
+        let headers: Header[] = [];
+        headers.push({ getContent: () => "Week"});
+
+        let daysOfWeek = DaysOfWeek.getShortNames(this.startDay());
+        let x = daysOfWeek.map((name) => <Header>{ getContent: () => name});
+        headers = headers.concat(x);
+
+        headers.push({ getContent: () => "Weekly Summary"});
+        return headers;
+    }
+
+    static create(): IHeaderBuilderStep1 {
+        return new HeaderBuilder();
+    }
 }
 
-interface DateCalendarCell extends CalendarCell {
-    rawDate: Date;
-    isCurrentMonth: boolean;
-    day: number;
+class DaysOfWeek {
+
+    private static data: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    
+    static get longNames(): string[]{
+        return DaysOfWeek.data;
+    }
+
+    static get shortNames(): string[] {
+        return DaysOfWeek.longNames.map(name => name.substring(0, 3));
+    }
+
+    static getLongNames(index: number): string[] {
+        return DaysOfWeek.reorder(index, DaysOfWeek.longNames);
+    }
+
+    static getShortNames(index: number): string[] {
+        return DaysOfWeek.reorder(index, DaysOfWeek.shortNames);
+    }
+
+    static reorder(index: number, names: string[]) {
+        if (index > 0) {
+            let left = names.slice(index);
+            let right = names.slice(0, index - 1);
+            return left.concat(right);
+        } else {
+            return names;
+        }
+    }
 }

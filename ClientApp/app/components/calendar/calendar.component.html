@@ -1,15 +1,7 @@
 <table class="be-calendar-table">
     <thead>
         <tr>
-            <th>Week</th>
-            <th>Mon</th>
-            <th>Tue</th>
-            <th>Wed</th>
-            <th>Thu</th>
-            <th>Fri</th>
-            <th>Sat</th>
-            <th>Sun</th>
-            <th>Summary</th>
+            <th *ngFor="let header of getHeaders()">{{ header.getContent() }}</th>
         </tr>
     </thead>
     <tbody>
