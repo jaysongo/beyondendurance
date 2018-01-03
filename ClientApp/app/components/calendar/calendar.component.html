@@ -1,0 +1,16 @@
+<mat-grid-list class="be-calendar-grid" cols="9" rowHeight="fit">
+    <mat-grid-tile></mat-grid-tile>
+    <mat-grid-tile>Monday</mat-grid-tile>
+    <mat-grid-tile>Tuesday</mat-grid-tile>
+    <mat-grid-tile>Wednesday</mat-grid-tile>
+    <mat-grid-tile>Thursday</mat-grid-tile>
+    <mat-grid-tile>Friday</mat-grid-tile>
+    <mat-grid-tile>Saturday</mat-grid-tile>
+    <mat-grid-tile>Sunday</mat-grid-tile>
+    <mat-grid-tile></mat-grid-tile>
+    
+    <mat-grid-tile *ngFor="let cell of cells">
+        {{ cell.content }}
+    </mat-grid-tile>
+    
+</mat-grid-list>

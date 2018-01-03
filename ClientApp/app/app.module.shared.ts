@@ -12,6 +12,7 @@ import { CounterComponent } from './components/counter/counter.component';
 import { AppModuleMaterial } from './app.module.material';
 import { AboutComponent } from './components/about/about.component';
 import { TrainComponent } from './components/train/train.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
 
 @NgModule({
     declarations: [
@@ -19,7 +20,7 @@ import { TrainComponent } from './components/train/train.component';
         NavMenuComponent,
         CounterComponent,
         FetchDataComponent,
-        HomeComponent, AboutComponent, TrainComponent
+        HomeComponent, AboutComponent, TrainComponent, CalendarComponent
     ],
     imports: [
         CommonModule,
