@@ -1,1 +1,15 @@
-<router-outlet></router-outlet>
+<mat-sidenav-container fullscreen>
+    <mat-sidenav>
+        <button mat-button>Close</button>
+    </mat-sidenav>
+    <div>
+        <mat-toolbar [class.mat-elevation-z6] color="primary">
+            <button mat-button routerLink="/"><mat-icon>home</mat-icon> Beyond Endurance</button>
+            <button mat-button routerLink="/about">About</button>
+            <button mat-button routerLink="/train">Train</button>
+        </mat-toolbar>
+        <div>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</mat-sidenav-container>

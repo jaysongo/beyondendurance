@@ -10,6 +10,8 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { AppModuleMaterial } from './app.module.material';
+import { AboutComponent } from './components/about/about.component';
+import { TrainComponent } from './components/train/train.component';
 
 @NgModule({
     declarations: [
@@ -17,7 +19,7 @@ import { AppModuleMaterial } from './app.module.material';
         NavMenuComponent,
         CounterComponent,
         FetchDataComponent,
-        HomeComponent
+        HomeComponent, AboutComponent, TrainComponent
     ],
     imports: [
         CommonModule,
@@ -27,6 +29,8 @@ import { AppModuleMaterial } from './app.module.material';
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
+            { path: 'about', component: AboutComponent },
+            { path: 'train', component: TrainComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
             { path: '**', redirectTo: 'home' }
