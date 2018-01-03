@@ -1,3 +1,49 @@
 .be-calendar-grid {
     height: 60vh;
 }
+
+.be-calendar-table {
+    height: 80vh;
+    width: 100%;
+    border: 1px solid darkgray;
+}
+
+.be-calendar-table th,
+.be-calendar-table td {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.be-calendar-table > thead {
+    font-size: 14px;
+    color: darkgray;
+}
+
+.be-calendar-table > thead th {
+    border: 1px solid darkgray;
+    border-bottom-width: 0;
+    height: 10px;
+}
+
+.be-calendar-table > tbody td {
+    border: 1px solid darkgray;
+    text-align: left;
+    vertical-align: top;
+}
+
+.be-calendar-table > tbody h2 {
+    font-size: 14px;
+    font-weight: 400;
+    color: gray;
+    margin: 0;
+    padding: 0;
+}
+
+.be-calendar-table > tbody tr:first-child td {
+    border-top-width: 0;
+}
+
+.be-calendar-table > tbody div.content {
+    font-size: 12px;
+    font-weight: 400;
+}

@@ -16,9 +16,54 @@ export class CalendarComponent implements OnInit {
 
     cells: CalendarCell[];
 
+    private emptyTitle = () => "";
+    private emptyContent = () => "";
+    private noDate = () => new Date();
+
     ngOnInit(): void {
         this.monthYearInitializer();
         this.updateCells();
+    }
+
+    getRows(): Row[] {
+        let rowCount = 5;
+
+        let date = new Date(2018, 0, 1);
+        date.setDate(-1);
+
+        let rows: Row[] = [];
+        for(let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+
+            let dayCells: Cell[] = [];
+
+            dayCells.push({
+                getTitle: this.emptyTitle,
+                getContent: this.emptyContent,
+                getDate: this.noDate
+            });
+            for(let columnIndex = 0; columnIndex < 7; columnIndex++) {
+
+                let cellDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+                dayCells.push({
+                    getTitle: () => this.title(cellDate),
+                    getContent: () => "some dummy string",
+                    getDate: () => cellDate
+                });
+
+                date = cellDate;
+            }
+            dayCells.push({
+                getTitle: this.emptyTitle,
+                getContent: this.emptyContent,
+                getDate: this.noDate
+            });
+
+            rows.push({
+                getCells: (): Cell[] => dayCells
+            });
+            
+        }
+        return rows;
     }
 
     private get monthYearInitializer(): () => void {
@@ -51,26 +96,52 @@ export class CalendarComponent implements OnInit {
     private getDateCells(month: number, year: number): CalendarCell[] {
         let date = new Date(year, month, 1);
         date.setDate(-1);
-        let rows = 6;
+        let rows = 5;
         let cols = 7;
         let count = rows * cols;
 
         let calendarCells: CalendarCell[] = [];
         for (let i = 0; i < rows; i++) {
-            calendarCells.push({ content: i.toString()});
+            calendarCells.push({ getTitle: () => "Week", getContent: this.emptyContent });
             for (let j = 0; j < cols; j++) {
                 let tempDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-                calendarCells.push({content: tempDate.getDate().toString()});
+                calendarCells.push({ getTitle: ()=> this.title(tempDate), getContent: this.emptyContent});
                 date = tempDate;
             }
-            calendarCells.push({content: "blah"});
+            calendarCells.push({ getTitle: () => "Summary", getContent: this.emptyContent });
         }
         return calendarCells;
     }
+
+    private title(date: Date): string {
+        if (date.getDate() == 1) {
+            return this.getMonthName(date) + " " + date.getDate();
+        }
+        return date.getDate().toString();
+    }
+
+    private getMonthName(date: Date): string {
+        switch(date.getMonth()) {
+            case 0: return "Jan";
+            case 1: return "Feb";
+            default: return "TBD";
+        }
+    }
+}
+
+interface Row {
+    getCells(): Cell[];
+}
+
+interface Cell {
+    getTitle(): string;
+    getContent(): string;
+    getDate(): Date;
 }
 
 interface CalendarCell {
-    content: string;
+    getTitle(): string;
+    getContent(): string;
 }
 
 interface DateCalendarCell extends CalendarCell {
