@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { HeaderBuilder } from './headerBuilder';
 
 @Component({
     selector: 'be-calendar',
@@ -13,13 +14,15 @@ export class CalendarComponent implements OnInit {
     @Input() startDay: number;
     @Input() initialMonth: number;
     @Input() initialYear: number;
+    @Input() useShortNames: boolean;
 
     private emptyTitle = () => "";
     private emptyContent = () => "";
     private noDate = () => new Date();
 
     ngOnInit(): void {
-        this.monthYearInitializer();
+        this.initMonthYearFactory();
+        this.initStartDayFactory();
     }
 
     getHeaders = () => HeaderBuilder.create()
@@ -67,8 +70,14 @@ export class CalendarComponent implements OnInit {
         return rows;
     }
 
-    private get monthYearInitializer(): () => void {
-        // A factory method for month/year initialization
+    private get initStartDayFactory(): () => void {
+        if (isNaN(this.startDay))
+            return () => this.startDay = 1;
+        else
+            return () => {};
+    }
+
+    private get initMonthYearFactory(): () => void {
         if (this.canInitializeMonthYear)
             return this.initializeMonthYear;
         else
@@ -106,18 +115,7 @@ export class CalendarComponent implements OnInit {
     }
 }
 
-interface IHeaderBuilder {
 
-    build(): Header[];
-}
-
-interface IHeaderBuilderStep1 {
-    withStartDay(startDay: number) : IHeaderBuilder;
-}
-
-interface Header {
-    getContent(): string;
-}
 
 interface Row {
     getCells(): Cell[];
@@ -129,59 +127,6 @@ interface Cell {
     getDate(): Date;
 }
 
-class HeaderBuilder implements IHeaderBuilder, IHeaderBuilderStep1 {
+class RowBuilder {
 
-    private startDay: () => number;
-
-    withStartDay(startDay: number): IHeaderBuilder {
-        this.startDay = () => startDay;
-        return this;
-    }
-
-    build(): Header[] {
-        let headers: Header[] = [];
-        headers.push({ getContent: () => "Week"});
-
-        let daysOfWeek = DaysOfWeek.getShortNames(this.startDay());
-        let x = daysOfWeek.map((name) => <Header>{ getContent: () => name});
-        headers = headers.concat(x);
-
-        headers.push({ getContent: () => "Weekly Summary"});
-        return headers;
-    }
-
-    static create(): IHeaderBuilderStep1 {
-        return new HeaderBuilder();
-    }
-}
-
-class DaysOfWeek {
-
-    private static data: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    
-    static get longNames(): string[]{
-        return DaysOfWeek.data;
-    }
-
-    static get shortNames(): string[] {
-        return DaysOfWeek.longNames.map(name => name.substring(0, 3));
-    }
-
-    static getLongNames(index: number): string[] {
-        return DaysOfWeek.reorder(index, DaysOfWeek.longNames);
-    }
-
-    static getShortNames(index: number): string[] {
-        return DaysOfWeek.reorder(index, DaysOfWeek.shortNames);
-    }
-
-    static reorder(index: number, names: string[]) {
-        if (index > 0) {
-            let left = names.slice(index);
-            let right = names.slice(0, index - 1);
-            return left.concat(right);
-        } else {
-            return names;
-        }
-    }
 }
