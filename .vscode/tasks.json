@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/beyondendurance.csproj"
+                "${workspaceFolder}/src/beyondendurance.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
