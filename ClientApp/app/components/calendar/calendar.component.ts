@@ -27,6 +27,7 @@ export class CalendarComponent implements OnInit {
 
     getHeaders = () => HeaderBuilder.create()
         .withStartDay(this.startDay)
+        .withShortNames(this.useShortNames)
         .build();
 
     getRows(): Row[] {

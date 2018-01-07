@@ -1,4 +1,6 @@
 import { WeekDays } from "./weekDays";
+import { toBoolean } from "../../../shared/converters/boolean";
+import { match } from "../../../shared/functional/match";
 
 interface Header {
     getContent(): string;
@@ -23,10 +25,10 @@ export class HeaderBuilder implements IHeaderBuilder, IHeaderBuilderStep1 {
     private getStartDay: () => number =
         () => { throw "Member is not initialized: startDay"; };
   
-    private getUseShortNames = () => false;
+    private getUseShortNames = (): boolean => false;
 
     withShortNames(useShortNames: boolean): IHeaderBuilder {
-        this.getUseShortNames = () => useShortNames;
+        this.getUseShortNames = () => toBoolean(useShortNames); // Necessary to ensure that useShortNames is converted to a boolean
         return this;
     }
 
@@ -37,9 +39,14 @@ export class HeaderBuilder implements IHeaderBuilder, IHeaderBuilderStep1 {
 
     build = () => new Array<Header>()
         .concat(<Header>{ getContent: this.getFirstHeaderName})
-        .concat(WeekDays.getShortNames(this.getStartDay())
+        .concat(this.namesFactory()
             .map((name) => <Header>{ getContent: () => name}))
         .concat(<Header>{ getContent: this.getLastHeaderName});
 
+    namesFactory = () => match(this.getUseShortNames())
+        .when((value) => value === true, WeekDays.getShortNames)
+        .when((value) => value === false, WeekDays.getLongNames)
+        .result();
+    
     static create = (): IHeaderBuilderStep1 => new HeaderBuilder();
 }
