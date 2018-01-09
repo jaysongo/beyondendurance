@@ -1,3 +1,5 @@
+import { guard } from "../guard";
+
 interface IMatch<TData> {
     with: () => ISomeStep<TData>;
 }
@@ -26,8 +28,12 @@ class Match<TData> implements IMatch<TData> {
 
 class SomeStepWithValue<TData> implements ISomeStep<TData> {
     constructor(private data: TData) {
+        guard("ctor").hasValue(data, "data");
+
         this.some = <TResult extends {}>(value: (data: TData) => TResult): INoneStep<TData, TResult> => 
-            new NoneStepWithValue<TData, TResult>(data, value);
+            guard("some")
+                .hasValue(value, "value")
+                .continueWith(() => new NoneStepWithValue<TData, TResult>(data, value));
     }
 
     some: <TResult extends {}>(value: (data: TData) => TResult) => INoneStep<TData, TResult>;
@@ -41,6 +47,10 @@ class SomeStepWithoutValue<TData> implements ISomeStep<TData> {
 class NoneStepWithValue<TData, TResult> implements INoneStep<TData, TResult> {
     
     constructor(data: TData, someValue: (data: TData) => TResult) {
+        guard("ctor")
+            .hasValue(data, "data")
+            .hasValue(someValue, "someValue");
+
         this.none = (noneValue: () => TResult): IOption<TData, TResult> => 
             new SomeOption<TData, TResult>(data, someValue);
     }
@@ -51,12 +61,18 @@ class NoneStepWithValue<TData, TResult> implements INoneStep<TData, TResult> {
 class NoneStepWithoutValue<TData, TResult> implements INoneStep<TData, TResult> {
     
     none = (value: () => TResult): IOption<TData, TResult> => 
-        new NoneOption<TData, TResult>(value);
+        guard("none")
+            .hasValue(value, "value")
+            .continueWith(() => new NoneOption<TData, TResult>(value));
 }
 
 class SomeOption<TData, TResult> implements IOption<TData, TResult> {
 
     constructor(data: TData, value: (data: TData) => TResult) {
+        guard("ctor")
+            .hasValue(data, "data")
+            .hasValue(value, "value");
+
         this.value = () => value(data);
     }
 
@@ -66,6 +82,8 @@ class SomeOption<TData, TResult> implements IOption<TData, TResult> {
 class NoneOption<TData, TResult> implements IOption<TData, TResult> {
 
     constructor(value: () => TResult) {
+        guard("ctor").hasValue(value, "value");
+
         this.value = value;
     }
 
